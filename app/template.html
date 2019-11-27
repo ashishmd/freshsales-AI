@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <link rel="stylesheet" href="https://static.freshdev.io/fdk/2.0/assets/freshsales.css">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+      <script src="https://static.freshdev.io/fdk/2.0/assets/fresh_client.js"></script>
+      <script src="https://unpkg.com/anycontrol/dist/index.umd.min.js"></script>
+      <script src="app.js"></script>
+   </head>
+   <body>
+      <div class="container">
+         <div class="align-middle text-center" style="margin-top: 50px">
+            This is your sample app. You can utilise this space to build your app.
+            <br/>
+            You can add your own element here.
+            <br/><br/>
+            Click on the below button.
+         </div>
+         <br/>
+         <div class="text-center">
+            <button onclick="openModal();" class="btn btn-primary" style="margin-top:20px">   Open Modal </button>
+         </div>
+      </div>
+
+<script>
+  var ctrl = new anycontrol()
+//   var recognition = new webkitSpeechRecognition();
+//   recognition.onerror = function(event) {
+//     console.log(event.error);
+// };
+
+  console.log({ctrl});
+  ctrl.addCommand("previous page", function() {
+    console.log('Go to previous page')
+  });
+
+  ctrl.addCommand("next page", function () {
+    console.log('Go to next page')
+  });
+
+  ctrl.addCommand("home", function() {
+    console.log("home");
+  });
+
+  ctrl.addCommand("test test", function() {
+    console.log("test");
+  });
+
+  ctrl.addCommand("create deal", function() {
+    client.interface.trigger("open", {
+      id: "deal"
+    }).then(function(data) {
+      // data - success message
+    }).catch(function(error) {
+      // error - error object
+    });
+
+  });
+  ctrl.addCommand("create contact", function() {
+    client.interface.trigger("open", {
+      id: "contact"
+    }).then(function(data) {
+      // data - success message
+    }).catch(function(error) {
+      // error - error object
+    });
+
+  });
+
+  ctrl.addCommand("create account", function() {
+    client.interface.trigger("open", {
+      id: "account"
+    }).then(function(data) {
+    }).catch(function(error) {
+    });
+  });
+
+  ctrl.addCommand("create lead", function() {
+    client.interface.trigger("open", {
+      id: "lead"
+    }).then(function(data) {
+      // data - success message
+    }).catch(function(error) {
+      // error - error object
+    });
+  });
+
+  ctrl.addCommand("give me", async function(param) {
+    // console.log(param)
+    let editedParam = !!param ? param.replace(' ', '_'): param;
+    console.log(editedParam);
+    let {currentEntityInfo} = await client.data.get("currentEntityInfo")
+    // console.log(currentEntityInfo);
+
+    let {domainName} = await client.data.get("domainName");
+    // console.log(domainName);
+
+    var headers = {"Authorization": "Token token=<%= (iparam.api_key) %>"};
+    var options = { headers: headers };
+    var url = "https://" + domainName + "/" + currentEntityInfo.currentEntityType + "s/" + currentEntityInfo.currentEntityId + ".json" ;
+    // console.log(url);
+    // console.log(options);
+    try {
+      let data = await client.request.get(url, options);
+      // console.log(JSON.parse(data.response));
+      let result = JSON.parse(data.response)[currentEntityInfo.currentEntityType][editedParam];
+      console.log(JSON.parse(data.response)[currentEntityInfo.currentEntityType][editedParam]);
+      if(!result){
+        client.interface.trigger("showNotify", {
+          type: "info",
+          message: `No results found: please check your command - value of ${param}`
+        })
+      } else {
+        client.interface.trigger("showNotify", {
+          type: "info",
+          message: result
+        })
+      }
+
+    } catch(error){
+      client.interface.trigger("showNotify", {
+        type: "info",
+        message: error
+      })
+    }
+
+
+  });
+
+ctrl.debug(true);
+
+  ctrl.start();
+  // ctrl.stop();
+</script>
+   </body>
+</html>
