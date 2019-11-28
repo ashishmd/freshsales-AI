@@ -13,6 +13,7 @@
   "whitelisted-domains": [
       "https://*.freshsales.io",
       "https://*.ashish.freshmarketeer.com",
-      "https://*.freshsales-dev.com*"
+      "https://*.freshsales-dev.com",
+      "https://*.freshdesk.com"
   ]
 }
