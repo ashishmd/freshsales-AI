@@ -11,19 +11,14 @@
    </head>
    <body>
       <div class="container">
-         <div class="align-middle text-center" style="margin-top: 50px">
-            This is your sample app. You can utilise this space to build your app.
-            <br/>
-            You can add your own element here.
-            <br/><br/>
-            Click on the below button.
-         </div>
-         <br/>
          <div class="text-center">
-            <button onclick="openModal();" class="btn btn-primary" style="margin-top:20px">   Open Modal </button>
+            <button onclick="ctrl.start();" class="btn btn-primary" style="margin-top:20px">Start Zeus </button>
          </div>
-      </div>
 
+         <div class="text-center">
+          <button onclick="ctrl.stop();" class="btn btn-primary" style="margin-top:20px">Stop Zeus </button>
+       </div>
+      </div>
 <script>
   function containsAny(str, substrings) {
     for (var i = 0; i != substrings.length; i++) {
@@ -35,6 +30,43 @@
     return null; 
   }
 
+  function speak(speechText){
+    try {
+      var synth = window.speechSynthesis;
+      if (synth.speaking) {
+          console.error('speechSynthesis.speaking');
+          return;
+      }
+      let voices = synth.getVoices().sort(function (a, b) {
+          const aname = a.name.toUpperCase(), bname = b.name.toUpperCase();
+          if ( aname < bname ) return -1;
+          else if ( aname == bname ) return 0;
+          else return +1;
+      });
+      if (speechText !== '') {
+        var utterThis = new SpeechSynthesisUtterance(speechText);
+        utterThis.onend = function (event) {
+            console.log('SpeechSynthesisUtterance.onend');
+        }
+        utterThis.onerror = function (event) {
+            console.error('SpeechSynthesisUtterance.onerror', event);
+        }
+        var selectedOption = "Fred";
+        for(i = 0; i < voices.length ; i++) {
+          if(voices[i].name === selectedOption) {
+            utterThis.voice = voices[i];
+            break;
+          }
+        }
+        utterThis.rate = 1;
+        utterThis.pitch = 0.6;
+        synth.speak(utterThis);
+      }
+    } catch (error) {
+      console.error(error); 
+    }
+  }
+
   var ctrl = new anycontrol();
 
   console.log({ctrl});
@@ -43,6 +75,7 @@
   // });
 
   ctrl.addCommand("kaise ho", function() {
+    speak(`Badiya. Aap batao.`);
     client.interface.trigger("showNotify", {
       type: "info",
       message: `Badiya. Aap batao.`
@@ -50,6 +83,8 @@
   });
 
   ctrl.addCommand("kya hua", function() {
+    speak(`Kya hi hoga.`);
+
     client.interface.trigger("showNotify", {
       type: "info",
       message: `Kya hi hoga.`
@@ -57,6 +92,7 @@
   });
 
   ctrl.addCommand("kya chal raha hai", function() {
+    speak(`Mera to sahi he. Tumhara kat raha hai.`)
     client.interface.trigger("showNotify", {
       type: "info",
       message: `Mera to sahi he. Tumhara kat raha hai.`
@@ -75,53 +111,52 @@
   function createEntity(param){
       let match = containsAny(param, ['lead', 'account', 'contact', 'deal']);
       if(match) {
-      client.interface.trigger("showNotify", {
-        type: "info",
-        message: `Let's create an ${param}`
-      });
-      client.interface.trigger("open", {
-        id: param
-      }).then(function(data) {
-      }).catch(function(error) {
-      });
-    } else {
-      client.interface.trigger("showNotify", {
-        type: "info",
-        message: `Cannot create ${param}`
-      });
-    }
+        speak(`Let's create a ${param}`)
+        client.interface.trigger("showNotify", {
+          type: "info",
+          message: `Let's create an ${param}`
+        });
+        client.interface.trigger("open", {
+          id: param
+        }).then(function(data) {
+        }).catch(function(error) {
+        });
+      } else {
+        speak(`Cannot create ${param}`)
+        client.interface.trigger("showNotify", {
+          type: "info",
+          message: `Cannot create ${param}`
+        });
+      }
   }
 
   ctrl.addCommand("give me", async function(param) {
+    speak(`Okay. Let me check ${param}`);
     client.interface.trigger("showNotify", {
       type: "info",
       message: `Okay. Let me check ${param}`
     })
-    // console.log(param)
     let editedParam = !!param ? param.replace(' ', '_'): param;
     console.log(editedParam);
     let {currentEntityInfo} = await client.data.get("currentEntityInfo")
-    // console.log(currentEntityInfo);
 
     let {domainName} = await client.data.get("domainName");
-    // console.log(domainName);
 
     var headers = {"Authorization": "Token token=<%= (iparam.api_key) %>"};
     var options = { headers: headers };
     var url = "https://" + domainName + "/" + currentEntityInfo.currentEntityType + "s/" + (currentEntityInfo.currentEntityId || "12000593870") + ".json" ;
-    // console.log(url);
-    // console.log(options);
     try {
       let data = await client.request.get(url, options);
-      // console.log(JSON.parse(data.response));
       let result = JSON.parse(data.response)[currentEntityInfo.currentEntityType][editedParam];
       console.log(JSON.parse(data.response)[currentEntityInfo.currentEntityType][editedParam]);
       if(!result){
+        speak(`No results found for ${param}`)
         client.interface.trigger("showNotify", {
           type: "info",
           message: `No results found for ${param}`
         })
       } else {
+        speak(result)
         client.interface.trigger("showNotify", {
           type: "info",
           message: result
@@ -129,6 +164,7 @@
       }
 
     } catch(error){
+      speak(error)
       client.interface.trigger("showNotify", {
         type: "info",
         message: error
@@ -151,9 +187,6 @@
     // }
   });
   ctrl.debug(true);
-
-  ctrl.start();
-  // ctrl.stop();
 </script>
    </body>
 </html>
