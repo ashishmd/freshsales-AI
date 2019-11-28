@@ -210,14 +210,55 @@
           }
 
         } catch(error){
-          speak(error)
+          speak(error.response)
           client.interface.trigger("showNotify", {
             type: "info",
-            message: error
+            message: error.response
           })
         }
+      });
 
+      ctrl.addCommand("notification", async function(param) {
+        speak(`Okay. Let me check latest notification`);
+        client.interface.trigger("showNotify", {
+          type: "info",
+          message: `Okay. Let me check latest notification`
+        })
+        // let editedParam = !!param ? param.replace(' ', '_'): param;
+        // console.log(editedParam);
+        debugger
+        let {currentEntityInfo} = await client.data.get("currentEntityInfo")
 
+        let {domainName} = await client.data.get("domainName");
+
+        var headers = {"Authorization": "Token token=<%= (iparam.api_key) %>"};
+        var options = { headers: headers };
+        var url = "https://platforms.freshdesk.com/notifications?results=3" ;
+        try {
+          let data = await client.request.get(url, options);
+          let result = JSON.parse(data.response);
+          console.log(JSON.parse(data.response));
+          if(!result){
+            speak(`No results found for ${param}`)
+            client.interface.trigger("showNotify", {
+              type: "info",
+              message: `No results found for ${param}`
+            })
+          } else {
+            speak(result)
+            client.interface.trigger("showNotify", {
+              type: "info",
+              message: result
+            })
+          }
+
+        } catch(error){
+          speak(error.response)
+          client.interface.trigger("showNotify", {
+            type: "info",
+            message: error.response
+          })
+        }
       });
 
       ctrl.addCommand('add',function(param) {
@@ -231,6 +272,26 @@
         //     message: `Cannot add ${param}`
         //   });
         // }
+      });
+
+      ctrl.addCommand("test", async function(param) {
+        var headers = {"Authorization": "Token token=U1T86etZ3KPUlfpQURzQVQ"};
+        var payload = {
+            "contact": {
+              "last_name": "james"
+            }
+        };
+        var options = { 
+          headers: headers, 
+          data: JSON.stringify(payload),
+          requestEvent: 'createContact'
+        };
+
+        client.request.invoke('onExternalEventHandler', options).then((response)=>{
+          speak(`contact created Successfully`);
+        }).catch((error)=>{
+          console.log({error})
+        });
       });
       ctrl.debug(true);
     </script>
