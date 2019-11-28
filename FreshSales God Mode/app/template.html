@@ -222,7 +222,7 @@
         if (param) {
           client.interface.trigger("showNotify", {
             type: "info",
-            message: `Let's edit ${entity} with last name ${param}`
+            message: `Showing ${entity} with name ${param}`
           });
 
           // console.log(currentEntityInfo);
@@ -246,7 +246,7 @@
             } else {
               client.interface.trigger("showNotify", {
                 type: "info",
-                message: `Edit ${entity} with ${param}`
+                message: `Showing ${entity} with name ${param}`
               })
             }
 
