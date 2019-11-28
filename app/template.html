@@ -73,7 +73,7 @@
             return substring;
           }
         }
-        return null; 
+        return null;
       }
 
       function speak(speechText){
@@ -109,7 +109,7 @@
             synth.speak(utterThis);
           }
         } catch (error) {
-          console.error(error); 
+          console.error(error);
         }
       }
 
@@ -144,6 +144,112 @@
           message: `Mera to sahi he. Tumhara kat raha hai.`
         });
       });
+
+      ctrl.addCommand("show leads", function(param) {
+        client.interface.trigger("show", {
+          id: "lead", value: null
+        }).then(function(data) {
+        }).catch(function(error) {
+        });
+      })
+
+      ctrl.addCommand("show contacts", function(param) {
+        client.interface.trigger("show", {
+          id: "contact", value: null
+        }).then(function(data) {
+        }).catch(function(error) {
+        });
+      })
+
+      ctrl.addCommand("show deals", function(param) {
+        client.interface.trigger("show", {
+          id: "deal", value: null
+        }).then(function(data) {
+        }).catch(function(error) {
+        });
+      })
+
+      ctrl.addCommand("show accounts", function(param) {
+        client.interface.trigger("show", {
+          id: "sales_account", value: null
+        }).then(function(data) {
+        }).catch(function(error) {
+        });
+      })
+
+      ctrl.addCommand("show lead", function(param) {
+        editEntity('lead', param);
+      })
+
+      ctrl.addCommand("show contact", function(param) {
+        editEntity('contact', param);
+      })
+
+      ctrl.addCommand("show deal", function(param) {
+        editEntity('deal', param);
+      })
+
+      ctrl.addCommand("show account", function(param) {
+        editEntity('sales_account', param);
+      })
+
+      async function editEntity(entity, param){
+        if (param) {
+          client.interface.trigger("showNotify", {
+            type: "info",
+            message: `Let's edit ${entity} with last name ${param}`
+          });
+
+          // console.log(currentEntityInfo);
+
+          let {domainName} = await client.data.get("domainName");
+          // console.log(domainName);
+
+          var headers = {"Authorization": "Token token=<%= (iparam.api_key) %>"};
+          var options = { headers: headers };
+          var url = "https://" + domainName + "/search.json" + "?q=" + param + `&include=${entity}&g=1&per_page=10`;
+          let id;
+          try {
+            let data = await client.request.get(url, options);
+            // console.log(JSON.parse(data.response));
+            id = JSON.parse(data.response)[0]['id'];
+            if(!id){
+              client.interface.trigger("showNotify", {
+                type: "info",
+                message: `No results found for ${param}`
+              })
+            } else {
+              client.interface.trigger("showNotify", {
+                type: "info",
+                message: `Edit ${entity} with ${param}`
+              })
+            }
+
+          } catch(error){
+            client.interface.trigger("showNotify", {
+              type: "info",
+              message: error
+            })
+          }
+          try {
+            client.interface.trigger("show", {
+              id: "lead", value: id
+            }).then(function(data) {
+            }).catch(function(error) {
+            });
+          } catch(error){
+            client.interface.trigger("showNotify", {
+              type: "info",
+              message: error
+            })
+          }
+        } else {
+          client.interface.trigger("showNotify", {
+            type: "info",
+            message: `Cannot create ${entity}`
+          });
+        }
+      }
 
       ctrl.addCommand("create", function(param) {
         createEntity(param);
