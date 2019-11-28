@@ -153,6 +153,7 @@
       });
 
       ctrl.addCommand("show leads", function(param) {
+        speak("Opening leads");
         client.interface.trigger("show", {
           id: "lead", value: null
         }).then(function(data) {
@@ -161,6 +162,7 @@
       })
 
       ctrl.addCommand("show contacts", function(param) {
+        speak("Opening contacts");
         client.interface.trigger("show", {
           id: "contact", value: null
         }).then(function(data) {
@@ -169,6 +171,7 @@
       })
 
       ctrl.addCommand("show deals", function(param) {
+        speak("Opening deals");
         client.interface.trigger("show", {
           id: "deal", value: null
         }).then(function(data) {
@@ -177,6 +180,7 @@
       })
 
       ctrl.addCommand("show accounts", function(param) {
+        speak("Opening accounts");
         client.interface.trigger("show", {
           id: "sales_account", value: null
         }).then(function(data) {
@@ -184,19 +188,23 @@
         });
       })
 
-      ctrl.addCommand("show lead", function(param) {
+      ctrl.addCommand("get me lead", function(param) {
+        speak("Showing leed " + param);
         editEntity('lead', param);
       })
 
-      ctrl.addCommand("show contact", function(param) {
+      ctrl.addCommand("get me contact", function(param) {
+        speak("Showing contact " + param);
         editEntity('contact', param);
       })
 
-      ctrl.addCommand("show deal", function(param) {
+      ctrl.addCommand("get me deal", function(param) {
+        speak("Showing deal " + param);
         editEntity('deal', param);
       })
 
-      ctrl.addCommand("show account", function(param) {
+      ctrl.addCommand("get me account", function(param) {
+        speak("Showing account " + param);
         editEntity('sales_account', param);
       })
 
@@ -240,7 +248,7 @@
           }
           try {
             client.interface.trigger("show", {
-              id: "lead", value: id
+              id: entity, value: id
             }).then(function(data) {
             }).catch(function(error) {
             });
@@ -385,8 +393,8 @@
               "last_name": param
             }
         };
-        var payload = { 
-          headers: headers, 
+        var payload = {
+          headers: headers,
           data: JSON.stringify(data),
           requestEvent: `create${entity}`
         };
