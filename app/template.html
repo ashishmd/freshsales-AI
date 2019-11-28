@@ -48,17 +48,36 @@
     console.log("test");
   });
 
-  ctrl.addCommand("create deal", function() {
-    client.interface.trigger("open", {
-      id: "deal"
-    }).then(function(data) {
-      // data - success message
-    }).catch(function(error) {
-      // error - error object
-    });
-
+  ctrl.addCommand("test test", function() {
+    console.log("test");
   });
+
+  ctrl.addCommand("kaise ho", function() {
+    client.interface.trigger("showNotify", {
+      type: "info",
+      message: `Badiya. Aap batao.`
+    });
+  });
+
+  ctrl.addCommand("kya hua", function() {
+    client.interface.trigger("showNotify", {
+      type: "info",
+      message: `Kya hi hoga.`
+    });
+  });
+
+  ctrl.addCommand("kya chal raha hai", function() {
+    client.interface.trigger("showNotify", {
+      type: "info",
+      message: `Mera to sahi he. Tumhara kat raha hai.`
+    });
+  });
+
   ctrl.addCommand("create contact", function() {
+    client.interface.trigger("showNotify", {
+      type: "info",
+      message: `Let's create a contact.`
+    });
     client.interface.trigger("open", {
       id: "contact"
     }).then(function(data) {
@@ -88,6 +107,10 @@
   });
 
   ctrl.addCommand("give me", async function(param) {
+    client.interface.trigger("showNotify", {
+      type: "info",
+      message: `Okay. Let me check ${param}`
+    })
     // console.log(param)
     let editedParam = !!param ? param.replace(' ', '_'): param;
     console.log(editedParam);
@@ -99,7 +122,7 @@
 
     var headers = {"Authorization": "Token token=<%= (iparam.api_key) %>"};
     var options = { headers: headers };
-    var url = "https://" + domainName + "/" + currentEntityInfo.currentEntityType + "s/" + currentEntityInfo.currentEntityId + ".json" ;
+    var url = "https://" + domainName + "/" + currentEntityInfo.currentEntityType + "s/" + (currentEntityInfo.currentEntityId || "12000593870") + ".json" ;
     // console.log(url);
     // console.log(options);
     try {
@@ -110,7 +133,7 @@
       if(!result){
         client.interface.trigger("showNotify", {
           type: "info",
-          message: `No results found: please check your command - value of ${param}`
+          message: `No results found for ${param}`
         })
       } else {
         client.interface.trigger("showNotify", {
