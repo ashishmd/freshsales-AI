@@ -25,32 +25,12 @@
       </div>
 
 <script>
-  var ctrl = new anycontrol()
-//   var recognition = new webkitSpeechRecognition();
-//   recognition.onerror = function(event) {
-//     console.log(event.error);
-// };
+  var ctrl = new anycontrol();
 
   console.log({ctrl});
-  ctrl.addCommand("previous page", function() {
-    console.log('Go to previous page')
-  });
-
-  ctrl.addCommand("next page", function () {
-    console.log('Go to next page')
-  });
-
-  ctrl.addCommand("home", function() {
-    console.log("home");
-  });
-
-  ctrl.addCommand("test test", function() {
-    console.log("test");
-  });
-
-  ctrl.addCommand("test test", function() {
-    console.log("test");
-  });
+  // ctrl.addCommand("home", function() {
+  //   console.log('Go to home page')
+  // });
 
   ctrl.addCommand("kaise ho", function() {
     client.interface.trigger("showNotify", {
@@ -73,38 +53,33 @@
     });
   });
 
-  ctrl.addCommand("create contact", function() {
-    client.interface.trigger("showNotify", {
-      type: "info",
-      message: `Let's create a contact.`
-    });
-    client.interface.trigger("open", {
-      id: "contact"
-    }).then(function(data) {
-      // data - success message
-    }).catch(function(error) {
-      // error - error object
-    });
-
+  ctrl.addCommand("create", function(param) {
+    createEntity(param);
   });
 
-  ctrl.addCommand("create account", function() {
-    client.interface.trigger("open", {
-      id: "account"
-    }).then(function(data) {
-    }).catch(function(error) {
-    });
+  ctrl.addCommand("create a", function(param) {
+    createEntity(param);
   });
 
-  ctrl.addCommand("create lead", function() {
-    client.interface.trigger("open", {
-      id: "lead"
-    }).then(function(data) {
-      // data - success message
-    }).catch(function(error) {
-      // error - error object
-    });
-  });
+
+  function createEntity(param){
+    if(['lead', 'account', 'contact', 'deal'].includes(param)) {
+      client.interface.trigger("showNotify", {
+        type: "info",
+        message: `Let's create an ${param}`
+      });
+      client.interface.trigger("open", {
+        id: param
+      }).then(function(data) {
+      }).catch(function(error) {
+      });
+    } else {
+      client.interface.trigger("showNotify", {
+        type: "info",
+        message: `Cannot create ${param}`
+      });
+    }
+  }
 
   ctrl.addCommand("give me", async function(param) {
     client.interface.trigger("showNotify", {
@@ -152,7 +127,7 @@
 
   });
 
-ctrl.debug(true);
+  ctrl.debug(true);
 
   ctrl.start();
   // ctrl.stop();
