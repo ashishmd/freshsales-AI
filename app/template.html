@@ -78,8 +78,10 @@
 
       function speak(speechText){
         try {
+          window.nextSpeech = null;
           var synth = window.speechSynthesis;
           if (synth.speaking) {
+              window.nextSpeech = speechText;
               console.error('speechSynthesis.speaking');
               return;
           }
@@ -93,6 +95,11 @@
             var utterThis = new SpeechSynthesisUtterance(speechText);
             utterThis.onend = function (event) {
                 console.log('SpeechSynthesisUtterance.onend');
+                if(window.nextSpeech){
+                  let text = window.nextSpeech;
+                  window.nextSpeech = null;
+                  speak(text)
+                }
             }
             utterThis.onerror = function (event) {
                 console.error('SpeechSynthesisUtterance.onerror', event);
@@ -263,15 +270,20 @@
       function createEntity(param){
           let match = containsAny(param, ['lead', 'account', 'contact', 'deal']);
           if(match) {
-            speak(`Let's create a ${param}`)
-            client.interface.trigger("showNotify", {
-              type: "info",
-              message: `Let's create an ${param}`
-            });
             client.interface.trigger("open", {
               id: param
             }).then(function(data) {
+              speak(`Let's open ${param} modal`)
+              client.interface.trigger("showNotify", {
+                type: "info",
+                message: `Let's open ${param} modal`
+              });
             }).catch(function(error) {
+              speak(`Cannot open ${param} modal`)
+              client.interface.trigger("showNotify", {
+                type: "info",
+                message: `Cannot open ${param} modal`
+              });
             });
           } else {
             speak(`Cannot create ${param}`)
@@ -366,20 +378,7 @@
         }
       });
 
-      ctrl.addCommand('add',function(param) {
-        window.postMessage('add', 'https://ashishtestfs2.freshsales.io/')
-        let match = containsAny(param, ['task', 'appointment']);
-        // if(match) {
-        //   // window.postMessage(param, 'https://ashishtestfs2.freshsales.io/')
-        // } else {
-        //   client.interface.trigger("showNotify", {
-        //     type: "info",
-        //     message: `Cannot add ${param}`
-        //   });
-        // }
-      });
-
-      function createEntityData(param){
+      function createEntityData(param, entity){
         var headers = {"Authorization": "Token token=U1T86etZ3KPUlfpQURzQVQ"};
         var data = {
             "contact": {
@@ -389,18 +388,25 @@
         var payload = { 
           headers: headers, 
           data: JSON.stringify(data),
-          requestEvent: 'createContact'
+          requestEvent: `create${entity}`
         };
 
+        console.log({payload});
+        
         client.request.invoke('onExternalEventHandler', payload).then((response)=>{
-          speak(`contact created Successfully`);
+          console.log('IMHIT')
+          speak(`${entity} created Successfully`);
         }).catch((error)=>{
           console.log({error})
-          speak(error);
+          speak(error.message);
         });
       }
-      ctrl.addCommand("create contact with name", async function(param) {
-        createEntityData(param);
+      ctrl.addCommand("add contact with name", async function(param) {
+        createEntityData(param, 'Contact');
+      });
+
+      ctrl.addCommand("add lead with name", async function(param) {
+        createEntityData(param, 'Lead');
       });
       ctrl.debug(true);
     </script>
