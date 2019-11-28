@@ -291,7 +291,7 @@
       }
 
       ctrl.addCommand("give me", async function(param) {
-        speak(`Okay. Let me check ${param}`);
+        speak(`Okay`);
         client.interface.trigger("showNotify", {
           type: "info",
           message: `Okay. Let me check ${param}`
@@ -304,10 +304,10 @@
 
         var headers = {"Authorization": "Token token=<%= (iparam.api_key) %>"};
         var options = { headers: headers };
-        var url = "https://" + domainName + "/" + currentEntityInfo.currentEntityType + "s/" + (currentEntityInfo.currentEntityId || "12000593870") + ".json" ;
+        var url = "https://" + domainName + "/leads/" + (currentEntityInfo.currentEntityId || "12000593870") + ".json" ;
         try {
           let data = await client.request.get(url, options);
-          let result = JSON.parse(data.response)[currentEntityInfo.currentEntityType][editedParam];
+          let result = JSON.parse(data.response)['lead'][editedParam];
           // console.log(JSON.parse(data.response)[currentEntityInfo.currentEntityType][editedParam]);
           if(!result){
             speak(`No results found for ${param}`)
