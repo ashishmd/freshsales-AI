@@ -25,6 +25,16 @@
       </div>
 
 <script>
+  function containsAny(str, substrings) {
+    for (var i = 0; i != substrings.length; i++) {
+       var substring = substrings[i];
+       if (str.indexOf(substring) != - 1) {
+         return substring;
+       }
+    }
+    return null; 
+  }
+
   var ctrl = new anycontrol();
 
   console.log({ctrl});
@@ -63,7 +73,8 @@
 
 
   function createEntity(param){
-    if(['lead', 'account', 'contact', 'deal'].includes(param)) {
+      let match = containsAny(param, ['lead', 'account', 'contact', 'deal']);
+      if(match) {
       client.interface.trigger("showNotify", {
         type: "info",
         message: `Let's create an ${param}`
@@ -127,6 +138,18 @@
 
   });
 
+  ctrl.addCommand('add',function(param) {
+    window.postMessage('add', 'https://ashishtestfs2.freshsales.io/')
+    let match = containsAny(param, ['task', 'appointment']);
+    // if(match) {
+    //   // window.postMessage(param, 'https://ashishtestfs2.freshsales.io/')
+    // } else {
+    //   client.interface.trigger("showNotify", {
+    //     type: "info",
+    //     message: `Cannot add ${param}`
+    //   });
+    // }
+  });
   ctrl.debug(true);
 
   ctrl.start();
