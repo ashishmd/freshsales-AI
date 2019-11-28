@@ -14,20 +14,21 @@
    <body>
     <style>
       .custom-control-label::before{
-        height: 16px;
-        width: 28px !important;
-        border-radius: 8px !important;
+        height: 26px;
+        width: 48px !important;
+        border-radius: 18px !important;
       }
       .custom-switch .custom-control-label::after {
-        height: 12px;
-        width: 12px;
+        height: 22px;
+        width: 22px;
+        border-radius: 18px !important;
       }
       .custom-switch {
         padding-left: 22px;
       }
 
       .custom-switch .custom-control-input:checked~.custom-control-label::after {
-        transform: translateX(1.25rem);
+        transform: translateX(2.25rem);
       }
       .custom-control-input:checked~.custom-control-label::before {
         border-color: #ffaf14;
@@ -36,34 +37,43 @@
 
       .custom-control.custom-switch {
         display: flex;
-        justify-content: center;
-        margin-top: 50px;
+        justify-content: flex-end;
+      }
+
+      .custom-control-label {
+        right: 30px;
+        bottom: 70px;
       }
     </style>
     <div class="container">
-        <div class="text-center">
-          <button class="btn btn-primary" style="margin-top:20px">Start Zeus </button>
+        <div class="text-center zeus-placeholder">
+          <img 
+            src="images/zeus_2.svg" 
+            alt="triangle with all three sides equal"
+            height="320"
+            width="150" />
         </div>
 
-        <div class="text-center">
-          <button class="btn btn-primary" style="margin-top:20px">Stop Zeus </button>
-        </div>
         <div class="custom-control custom-switch">
           <input type="checkbox" onclick="switchHandler(this)" value='off' class="custom-control-input" id="customSwitch1">
           <label class="custom-control-label" for="customSwitch1">
-            <span style="padding-left: 10px;">Toggle Zeus</span>
           </label>
         </div>
     </div>
     <script>
       function switchHandler(event){
+        let image = document.querySelector('.zeus-placeholder img');
         if(event.value === 'off'){
+          image.src = 'images/zeus_1.svg';
           event.value = 'on';
           ctrl.start();
+          speak('God Mode Enabled');
           return;
         }
-        ctrl.stop();
+        image.src = 'images/zeus_2.svg';
         event.value = 'off';
+        ctrl.stop();
+        speak('God Mode disabled');
         return;
       }
       function containsAny(str, substrings) {
@@ -350,8 +360,6 @@
           type: "info",
           message: `Okay. Let me check latest notification`
         })
-        // let editedParam = !!param ? param.replace(' ', '_'): param;
-        // console.log(editedParam);
         let {currentEntityInfo} = await client.data.get("currentEntityInfo")
 
         let {domainName} = await client.data.get("domainName");
@@ -386,7 +394,7 @@
         }
       });
 
-      function createEntityData(param, entity){
+      function addEntityData(param, entity){
         var headers = {"Authorization": "Token token=U1T86etZ3KPUlfpQURzQVQ"};
         var data = {
             "contact": {
@@ -410,11 +418,11 @@
         });
       }
       ctrl.addCommand("add contact with name", async function(param) {
-        createEntityData(param, 'Contact');
+        addEntityData(param, 'Contact');
       });
 
       ctrl.addCommand("add lead with name", async function(param) {
-        createEntityData(param, 'Lead');
+        addEntityData(param, 'Lead');
       });
       ctrl.debug(true);
     </script>
