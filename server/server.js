@@ -17,10 +17,10 @@ exports = {
         json: payloadData,
         method: "POST"
       }).then((response) => {
-        console.info('Successfully closed the ticket in Freshdesk', response);
+        console.info('Success', response);
         renderData();
       }, error => {
-        console.error('Error: Failed to close the ticket in Freshdesk');
+        console.error('Error');
         console.error(error)
         renderData({ message: error.message });;
       })  

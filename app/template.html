@@ -289,7 +289,7 @@
           message: `Okay. Let me check ${param}`
         })
         let editedParam = !!param ? param.replace(' ', '_'): param;
-        console.log(editedParam);
+        // console.log(editedParam);
         let {currentEntityInfo} = await client.data.get("currentEntityInfo")
 
         let {domainName} = await client.data.get("domainName");
@@ -300,7 +300,7 @@
         try {
           let data = await client.request.get(url, options);
           let result = JSON.parse(data.response)[currentEntityInfo.currentEntityType][editedParam];
-          console.log(JSON.parse(data.response)[currentEntityInfo.currentEntityType][editedParam]);
+          // console.log(JSON.parse(data.response)[currentEntityInfo.currentEntityType][editedParam]);
           if(!result){
             speak(`No results found for ${param}`)
             client.interface.trigger("showNotify", {
@@ -332,7 +332,6 @@
         })
         // let editedParam = !!param ? param.replace(' ', '_'): param;
         // console.log(editedParam);
-        debugger
         let {currentEntityInfo} = await client.data.get("currentEntityInfo")
 
         let {domainName} = await client.data.get("domainName");
@@ -380,24 +379,28 @@
         // }
       });
 
-      ctrl.addCommand("test", async function(param) {
+      function createEntityData(param){
         var headers = {"Authorization": "Token token=U1T86etZ3KPUlfpQURzQVQ"};
-        var payload = {
+        var data = {
             "contact": {
-              "last_name": "james"
+              "last_name": param
             }
         };
-        var options = { 
+        var payload = { 
           headers: headers, 
-          data: JSON.stringify(payload),
+          data: JSON.stringify(data),
           requestEvent: 'createContact'
         };
 
-        client.request.invoke('onExternalEventHandler', options).then((response)=>{
+        client.request.invoke('onExternalEventHandler', payload).then((response)=>{
           speak(`contact created Successfully`);
         }).catch((error)=>{
           console.log({error})
+          speak(error);
         });
+      }
+      ctrl.addCommand("create contact with name", async function(param) {
+        createEntityData(param);
       });
       ctrl.debug(true);
     </script>
